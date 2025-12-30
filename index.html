@@ -99,7 +99,6 @@
             border-radius: 8px;
             background: #fafafa;
             min-height: 300px;
-            max-height: 600px;
         }
 
         .message {
@@ -107,6 +106,13 @@
             padding: 12px 16px;
             border-radius: 8px;
             max-width: 80%;
+            opacity: 0;
+            animation: fadeIn 0.3s ease forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .user-message {
@@ -114,12 +120,14 @@
             color: white;
             margin-left: auto;
             text-align: right;
+            animation-delay: 0.1s;
         }
 
         .bot-message {
             background: #e9ecef;
             color: #333;
             margin-right: auto;
+            animation-delay: 0.2s;
         }
 
         .input-area {
@@ -172,10 +180,113 @@
             background: #007bff;
         }
 
-        .loading {
-            text-align: center;
+        /* Styles pour le loading */
+        .loading-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 30px;
+            margin: 20px 0;
+            background: #f8f9fa;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid #e0e0e0;
+            border-top: 3px solid #007bff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            font-size: 16px;
             color: #666;
-            padding: 10px;
+            font-weight: 500;
+            margin-bottom: 10px;
+        }
+
+        .loading-dots {
+            display: flex;
+            gap: 5px;
+            margin-top: 10px;
+        }
+
+        .loading-dots span {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #007bff;
+            opacity: 0.6;
+            animation: pulse 1.4s infinite ease-in-out;
+        }
+
+        .loading-dots span:nth-child(1) { animation-delay: -0.32s; }
+        .loading-dots span:nth-child(2) { animation-delay: -0.16s; }
+        .loading-dots span:nth-child(3) { animation-delay: 0s; }
+
+        @keyframes pulse {
+            0%, 80%, 100% { transform: scale(0.8); opacity: 0.6; }
+            40% { transform: scale(1.2); opacity: 1; }
+        }
+
+        .thinking-text {
+            color: #666;
+            font-style: italic;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        /* Styles pour l'affichage progressif */
+        .typing-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 15px;
+            background: #f0f0f0;
+            border-radius: 20px;
+            width: fit-content;
+            margin-bottom: 15px;
+        }
+
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            background: #666;
+            border-radius: 50%;
+            animation: typing 1.4s infinite ease-in-out;
+        }
+
+        .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+        .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+        .typing-dot:nth-child(3) { animation-delay: 0s; }
+
+        @keyframes typing {
+            0%, 80%, 100% { transform: translateY(0); opacity: 0.6; }
+            40% { transform: translateY(-10px); opacity: 1; }
+        }
+
+        .response-content {
+            line-height: 1.6;
+            opacity: 0;
+            transform: translateY(10px);
+            animation: typewriter 0.05s steps(1) forwards;
+        }
+
+        @keyframes typewriter {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .error {
@@ -195,7 +306,7 @@
             text-align: center;
         }
 
-        /* Styles simples pour le feedback */
+        /* Styles pour le formatage des réponses */
         .feedback-container {
             font-size: 14px;
         }
@@ -206,6 +317,16 @@
             background: white;
             border-radius: 8px;
             border-left: 4px solid #007bff;
+            opacity: 0;
+            transform: translateY(10px);
+            animation: fadeInUp 0.5s ease forwards;
+        }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .feedback-title {
@@ -228,6 +349,9 @@
 
         .feedback-item {
             margin-bottom: 8px;
+            opacity: 0;
+            animation: fadeIn 0.3s ease forwards;
+            animation-delay: calc(var(--item-index) * 0.1s);
         }
 
         .improvement-item {
@@ -243,13 +367,11 @@
             padding: 10px;
             border-radius: 5px;
             margin: 8px 0;
-            font-size: 13px;
         }
 
         .example-original {
             color: #d32f2f;
             font-style: italic;
-            margin-bottom: 5px;
         }
 
         .example-improved {
@@ -262,7 +384,7 @@
             padding: 10px;
             border-radius: 5px;
             margin: 8px 0;
-            font-size: 13px;
+            border-left: 3px solid #4caf50;
         }
 
         .level-assessment {
@@ -286,64 +408,12 @@
             background: #4caf50;
             margin-top: 10px;
             width: 100%;
+            animation: fadeIn 0.5s ease 1s forwards;
+            opacity: 0;
         }
 
         .new-prompt-button:hover {
             background: #388e3c;
-        }
-
-        /* Typing indicator */
-        .typing-indicator {
-            display: inline-block;
-            padding: 8px 12px;
-            background: #e9ecef;
-            border-radius: 15px;
-            margin-bottom: 10px;
-        }
-
-        .typing-dots {
-            display: inline-block;
-        }
-
-        .typing-dots span {
-            display: inline-block;
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: #666;
-            margin: 0 2px;
-            animation: typing 1.4s infinite both;
-        }
-
-        .typing-dots span:nth-child(2) {
-            animation-delay: 0.2s;
-        }
-
-        .typing-dots span:nth-child(3) {
-            animation-delay: 0.4s;
-        }
-
-        @keyframes typing {
-            0%, 60%, 100% { transform: translateY(0); }
-            30% { transform: translateY(-5px); }
-        }
-
-        /* Streaming text animation */
-        .streaming-text {
-            white-space: pre-wrap;
-            word-wrap: break-word;
-        }
-
-        /* Feedback simple */
-        .feedback-point {
-            margin-bottom: 8px;
-            padding-left: 10px;
-        }
-
-        .feedback-point:before {
-            content: "• ";
-            color: #007bff;
-            font-weight: bold;
         }
     </style>
 </head>
@@ -391,8 +461,6 @@
             currentWords: 0,
             isActive: false
         };
-        let accumulatedContent = '';
-        let isProcessingStream = false;
 
         // Sujets aléatoires pour les prompts d'écriture
         const WRITING_PROMPTS = [
@@ -460,13 +528,9 @@
                 isActive: true
             };
 
-            // Réinitialiser les variables de streaming
-            accumulatedContent = '';
-            isProcessingStream = false;
-
             // Afficher le prompt
             writingPrompt.innerHTML = `
-                <div class="prompt-title">Writing Challenge: ${randomPrompt.title}</div>
+                <div class="prompt-title">✍️ Writing Challenge: ${randomPrompt.title}</div>
                 <div class="prompt-description">${randomPrompt.description}</div>
                 <div class="word-count">
                     <div class="word-count-progress">
@@ -527,26 +591,30 @@
         }
 
         // Ajouter un message dans le chat
-        function addMessage(content, isUser = false, isStreaming = false) {
+        function addMessage(content, isUser = false, isTyping = false) {
             const messageDiv = document.createElement('div');
             messageDiv.className = `message ${isUser ? 'user-message' : 'bot-message'}`;
             
-            if (!isUser) {
-                if (isStreaming) {
-                    // Pour le streaming, on utilise un conteneur spécial
-                    messageDiv.innerHTML = `<div class="streaming-text">${content}</div>`;
-                    messageDiv.id = 'streaming-message';
+            if (isTyping) {
+                // Afficher l'indicateur de frappe
+                messageDiv.innerHTML = `
+                    <div class="typing-indicator">
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                        <div class="thinking-text">AI is thinking...</div>
+                    </div>
+                `;
+            } else if (!isUser) {
+                // Essayer de parser comme JSON
+                const parsedResponse = parseJsonResponse(content);
+                
+                if (parsedResponse && parsedResponse.feedback) {
+                    // C'est un feedback formaté, utiliser le formatage spécial
+                    messageDiv.innerHTML = formatFeedbackResponse(parsedResponse);
                 } else {
-                    // Essayer de parser comme JSON
-                    const parsedResponse = parseJsonResponse(content);
-                    
-                    if (parsedResponse && parsedResponse.feedback) {
-                        // C'est un feedback formaté, utiliser le formatage spécial
-                        messageDiv.innerHTML = formatFeedbackResponse(parsedResponse);
-                    } else {
-                        // Sinon, afficher le texte normalement
-                        messageDiv.innerHTML = content;
-                    }
+                    // Sinon, afficher le texte normalement
+                    messageDiv.innerHTML = `<div class="response-content">${content}</div>`;
                 }
             } else {
                 // Message utilisateur : texte simple
@@ -554,57 +622,83 @@
                 messageDiv.innerHTML = `${content}<br><small><em>(${wordCount} words)</em></small>`;
             }
             
-            if (isStreaming && document.getElementById('streaming-message')) {
-                // Remplacer le message existant
-                const existingMessage = document.getElementById('streaming-message');
-                existingMessage.parentNode.replaceChild(messageDiv, existingMessage);
-            } else {
-                chatContainer.appendChild(messageDiv);
-            }
+            chatContainer.appendChild(messageDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
             
+            return messageDiv;
+        }
+
+        // Afficher un indicateur de chargement élégant
+        function showLoading() {
+            const loadingDiv = document.createElement('div');
+            loadingDiv.id = 'loading';
+            loadingDiv.className = 'loading-container';
+
+            chatContainer.appendChild(loadingDiv);
             chatContainer.scrollTop = chatContainer.scrollHeight;
         }
 
-        // Afficher l'indicateur de frappe
-        function showTypingIndicator() {
-            const typingDiv = document.createElement('div');
-            typingDiv.className = 'message bot-message';
-            typingDiv.id = 'typing-indicator';
-            typingDiv.innerHTML = `
-                <div class="typing-indicator">
-                    <div class="typing-dots">
-                        <span></span><span></span><span></span>
-                    </div>
-                </div>
-            `;
-            chatContainer.appendChild(typingDiv);
-            chatContainer.scrollTop = chatContainer.scrollHeight;
-        }
-
-        // Masquer l'indicateur de frappe
-        function hideTypingIndicator() {
-            const typingDiv = document.getElementById('typing-indicator');
-            if (typingDiv) {
-                typingDiv.remove();
+        // Masquer l'indicateur de chargement
+        function hideLoading() {
+            const loadingDiv = document.getElementById('loading');
+            if (loadingDiv) {
+                loadingDiv.remove();
             }
         }
 
-        // Fonction pour nettoyer et parser le JSON
+        // Fonction pour afficher le texte progressivement
+        function typeText(element, text, speed = 20) {
+            return new Promise((resolve) => {
+                let i = 0;
+                element.innerHTML = '';
+                
+                function typeChar() {
+                    if (i < text.length) {
+                        // Ajouter le caractère suivant
+                        element.innerHTML += text.charAt(i);
+                        i++;
+                        
+                        // Faire défiler vers le bas
+                        chatContainer.scrollTop = chatContainer.scrollHeight;
+                        
+                        // Prochain caractère
+                        setTimeout(typeChar, speed);
+                    } else {
+                        resolve();
+                    }
+                }
+                
+                typeChar();
+            });
+        }
+
+        // Fonction pour afficher une réponse progressivement
+        function displayProgressiveResponse(messageDiv, content) {
+            const contentDiv = messageDiv.querySelector('.response-content');
+            if (contentDiv) {
+                return typeText(contentDiv, content, 10);
+            }
+            return Promise.resolve();
+        }
+
+        // Fonction pour parser le JSON
         function parseJsonResponse(text) {
             try {
+                // Supprimer les backticks et le mot "json" s'ils existent
                 let cleanedText = text.trim();
                 
-                // Enlever les backticks si présents
+                // Si le texte commence par ```json et finit par ```
                 if (cleanedText.startsWith('```json')) {
-                    cleanedText = cleanedText.substring(7);
+                    cleanedText = cleanedText.substring(7); // Enlever ```json
                 }
                 if (cleanedText.startsWith('```')) {
-                    cleanedText = cleanedText.substring(3);
+                    cleanedText = cleanedText.substring(3); // Enlever ``` au début
                 }
                 if (cleanedText.endsWith('```')) {
-                    cleanedText = cleanedText.substring(0, cleanedText.length - 3);
+                    cleanedText = cleanedText.substring(0, cleanedText.length - 3); // Enlever ``` à la fin
                 }
                 
+                // Parser le JSON
                 return JSON.parse(cleanedText);
             } catch (error) {
                 console.error('Erreur de parsing JSON:', error);
@@ -612,150 +706,71 @@
             }
         }
 
-        // Nettoyer le contenu du streaming
-        function cleanStreamContent(content) {
-            // Retirer les fragments JSON de métadonnées
-            return content
-                .replace(/\{id:"[^"]+",object:"[^"]+",created:\d+,model:"[^"]+",choices:\[.*?\]\}/g, '')
-                .replace(/\\"/g, '"')
-                .replace(/\s+/g, ' ')
-                .trim();
-        }
-
-        // Traiter les données du streaming
-        function processStreamData(data) {
-            try {
-                const lines = data.split('\n');
-                for (const line of lines) {
-                    if (line.trim() === '' || line.trim() === 'data: [DONE]') {
-                        continue;
-                    }
-                    
-                    if (line.startsWith('data: ')) {
-                        const jsonStr = line.substring(6);
-                        if (jsonStr.trim() === '[DONE]') {
-                            continue;
-                        }
-                        
-                        try {
-                            const chunk = JSON.parse(jsonStr);
-                            if (chunk.choices && chunk.choices[0] && chunk.choices[0].delta && chunk.choices[0].delta.content) {
-                                const content = chunk.choices[0].delta.content;
-                                accumulatedContent += content;
-                                
-                                // Nettoyer et afficher le contenu accumulé
-                                const cleanedContent = cleanStreamContent(accumulatedContent);
-                                
-                                // Extraire le JSON du contenu
-                                const jsonMatch = cleanedContent.match(/\{[\s\S]*\}/);
-                                if (jsonMatch) {
-                                    try {
-                                        const parsedJson = JSON.parse(jsonMatch[0]);
-                                        // Afficher le contenu formaté
-                                        const formattedContent = formatFeedbackResponse(parsedJson);
-                                        
-                                        // Remplacer le message de streaming
-                                        if (document.getElementById('streaming-message')) {
-                                            document.getElementById('streaming-message').remove();
-                                        }
-                                        
-                                        addMessage(formattedContent, false);
-                                    } catch (e) {
-                                        // Si le parsing JSON échoue, afficher le texte brut
-                                        addMessage(cleanedContent, false, true);
-                                    }
-                                } else {
-                                    // Afficher le texte brut si pas de JSON
-                                    addMessage(cleanedContent, false, true);
-                                }
-                            }
-                        } catch (e) {
-                            console.log('Chunk parsing error:', e);
-                        }
-                    }
-                }
-            } catch (error) {
-                console.error('Stream processing error:', error);
-            }
-        }
-
-        // Formater la réponse JSON en HTML simple
+        // Formater la réponse JSON en HTML lisible
         function formatFeedbackResponse(data) {
             const feedback = data.feedback;
             
             let html = `
                 <div class="feedback-container">
                     <div class="feedback-section">
-                        <div class="feedback-title">Overall Assessment</div>
-                        <div class="feedback-item" style="margin-bottom: 15px;">${feedback.general.overall_impression}</div>
-            `;
-
-            // Points forts
-            if (feedback.general.strengths && feedback.general.strengths.length > 0) {
-                html += `
-                    <div class="feedback-subtitle">Strengths:</div>
-                    <div class="feedback-list">
-                        ${feedback.general.strengths.map(strength => 
-                            `<div class="feedback-point">${strength}</div>`
-                        ).join('')}
+                        <div class="feedback-title">📊 Overall Impressions</div>
+                        <div class="feedback-item" style="--item-index: 0">${feedback.general.overall_impression}</div>
+                        
+                        <div class="feedback-subtitle">✅ Strengths:</div>
+                        <div class="feedback-list">
+                            ${feedback.general.strengths.map((strength, index) => 
+                                `<div class="feedback-item" style="--item-index: ${index + 1}">• ${strength}</div>`
+                            ).join('')}
+                        </div>
+                        
+                        <div class="feedback-subtitle">💪 Encouragement:</div>
+                        <div class="feedback-item" style="--item-index: ${feedback.general.strengths.length + 2}">${feedback.general.encouragement}</div>
                     </div>
-                `;
-            }
-
-            // Message d'encouragement
-            if (feedback.general.encouragement) {
-                html += `
-                    <div class="feedback-subtitle" style="margin-top: 15px;">Encouragement:</div>
-                    <div class="feedback-item" style="font-style: italic;">${feedback.general.encouragement}</div>
-                `;
-            }
-
-            html += `</div>`;
+            `;
 
             // Améliorations suggérées
             if (feedback.improvements && feedback.improvements.length > 0) {
+                let itemIndex = feedback.general.strengths.length + 5;
+                
                 html += `
                     <div class="feedback-section">
-                        <div class="feedback-title">Areas for Improvement</div>
+                        <div class="feedback-title">🔧 Suggested Improvements</div>
                 `;
                 
-                feedback.improvements.forEach(improvement => {
+                feedback.improvements.forEach((improvement, impIndex) => {
                     html += `
-                        <div class="improvement-item">
-                            <div class="feedback-subtitle">${improvement.category}: ${improvement.title}</div>
-                            <div class="feedback-item" style="margin: 8px 0;">${improvement.description}</div>
+                        <div class="improvement-item" style="--item-index: ${itemIndex++}">
+                            <div class="feedback-subtitle">${improvement.category} : ${improvement.title}</div>
+                            <div class="feedback-item">${improvement.description}</div>
+                            <div class="feedback-item"><em>${improvement.explanation}</em></div>
                             
-                            <div class="feedback-item" style="font-size: 13px; color: #666;">${improvement.explanation}</div>
+                            <div class="feedback-subtitle">💡 Examples:</div>
                     `;
                     
-                    // Afficher les exemples
+                    // Afficher tous les exemples s'ils existent
                     if (improvement.examples && improvement.examples.original_excerpts && improvement.examples.improved_versions) {
                         const examples = Math.min(improvement.examples.original_excerpts.length, improvement.examples.improved_versions.length);
                         
-                        if (examples > 0) {
-                            html += `<div class="feedback-subtitle" style="margin-top: 12px;">Examples:</div>`;
-                            
-                            for (let i = 0; i < examples; i++) {
-                                html += `
-                                    <div class="example-box">
-                                        <div class="example-original">${improvement.examples.original_excerpts[i]}</div>
-                                        <div class="example-improved">${improvement.examples.improved_versions[i]}</div>
+                        for (let i = 0; i < examples; i++) {
+                            html += `
+                                <div class="example-box" style="--item-index: ${itemIndex++}">
+                                    <div class="example-original">
+                                        <strong>Original:</strong> ${improvement.examples.original_excerpts[i]}
                                     </div>
-                                `;
-                            }
+                                    <div class="example-improved">
+                                        <strong>Improved:</strong> ${improvement.examples.improved_versions[i]}
+                                    </div>
+                                </div>
+                            `;
                         }
                     }
                     
-                    // Conseil de pratique
-                    if (improvement.practice_tip) {
-                        html += `
-                            <div class="tip-box">
+                    html += `
+                            <div class="tip-box" style="--item-index: ${itemIndex++}">
                                 <strong>Practice Tip:</strong> ${improvement.practice_tip}
                             </div>
-                        `;
-                    }
-                    
-                    html += `</div>`;
+                        </div>
+                    `;
                 });
                 
                 html += `</div>`;
@@ -763,16 +778,18 @@
 
             // Conseils de progression
             if (feedback.progression_tips && feedback.progression_tips.length > 0) {
+                let itemIndex = 50; // Start at higher index for later animation
+                
                 html += `
                     <div class="feedback-section">
-                        <div class="feedback-title">Progression Tips</div>
+                        <div class="feedback-title">🎯 Progression Tips</div>
                 `;
                 
-                feedback.progression_tips.forEach(tip => {
+                feedback.progression_tips.forEach((tip, tipIndex) => {
                     html += `
-                        <div class="tip-box">
+                        <div class="tip-box" style="--item-index: ${itemIndex++}">
                             <div><strong>${tip.area}:</strong> ${tip.tip}</div>
-                            <div style="margin-top: 4px; font-size: 13px; color: #666;">${tip.reason}</div>
+                            <div><em>Reason:</em> ${tip.reason}</div>
                         </div>
                     `;
                 });
@@ -785,17 +802,15 @@
                 const level = feedback.level_assessment;
                 html += `
                     <div class="feedback-section">
-                        <div class="feedback-title">Level Assessment</div>
-                        <div class="level-assessment">
-                            <div style="margin-bottom: 10px;">
-                                <span class="level-badge">${level.estimated_cefr}</span>
-                                <span>Confidence: ${Math.round(level.confidence_score * 100)}%</span>
-                            </div>
+                        <div class="feedback-title">📈 Level Assessment</div>
+                        <div class="level-assessment" style="--item-index: 60">
+                            <span class="level-badge">${level.estimated_cefr}</span>
+                            <span>Confidence: ${Math.round(level.confidence_score * 100)}%</span>
                             
-                            <div class="feedback-subtitle">Goals for Next Level:</div>
+                            <div class="feedback-subtitle" style="margin-top: 10px;">🎯 Goals for Next Level:</div>
                             <div class="feedback-list">
-                                ${level.next_level_goals.map(goal => 
-                                    `<div class="feedback-point">${goal}</div>`
+                                ${level.next_level_goals.map((goal, index) => 
+                                    `<div class="feedback-item" style="--item-index: ${61 + index}">• ${goal}</div>`
                                 ).join('')}
                             </div>
                         </div>
@@ -827,16 +842,16 @@
         function showSuccess(message) {
             const successDiv = document.createElement('div');
             successDiv.className = 'success-message';
-            successDiv.textContent = message;
+            successDiv.innerHTML = message;
             chatContainer.appendChild(successDiv);
             chatContainer.scrollTop = chatContainer.scrollHeight;
         }
 
-        // Envoyer un message à l'API avec streaming
+        // Envoyer un message à l'API
         async function sendMessage() {
             const userMessage = messageInput.value.trim();
             
-            if (!userMessage || !currentWritingSession.isActive || isProcessingStream) return;
+            if (!userMessage || !currentWritingSession.isActive) return;
             
             // Vérifier le nombre de mots
             const wordCount = countWords(userMessage);
@@ -847,7 +862,6 @@
             
             // Désactiver la session d'écriture actuelle
             currentWritingSession.isActive = false;
-            isProcessingStream = true;
             
             // Désactiver l'input pendant le traitement
             messageInput.disabled = true;
@@ -857,60 +871,59 @@
             addMessage(userMessage, true);
             messageInput.value = '';
             
-            // Afficher le message de succès
-            showSuccess(`Great job! You wrote ${wordCount} words. Now analyzing your writing...`);
+
             
-            // Afficher l'indicateur de frappe
-            showTypingIndicator();
+            // Afficher l'indicateur de chargement
+            showLoading();
             
-            // Réinitialiser le contenu accumulé
-            accumulatedContent = '';
+            // Ajouter l'indicateur "IA en train de réfléchir"
+            const typingMessage = addMessage('', false, true);
             
             try {
                 // Préparer les messages pour l'API
                 const messages = [
                     {
                         role: 'system',
-                        content: `You are an expert English writing tutor. The user has just completed a writing exercise on: "${currentWritingSession.topic}". 
-                        They were asked to write at least ${currentWritingSession.requiredWords} words and wrote ${wordCount} words.
+                        content: `Vous êtes un tuteur expert en rédaction anglaise. L'utilisateur vient de terminer un exercice d'écriture sur le thème : "${currentWritingSession.topic}". 
+                On leur a demandé d'écrire au moins ${currentWritingSession.requiredWords} mots et ils ont écrit ${wordCount} mots.
                         
-                        Please provide detailed feedback on their writing in the following JSON format:
+                        Veuillez fournir un retour détaillé sur leur écriture dans le format JSON suivant :
                         {
                             "feedback": {
                                 "general": {
-                                    "overall_impression": "Brief overall impression",
-                                    "strengths": ["strength 1", "strength 2", "strength 3"],
-                                    "encouragement": "Encouragement message"
+                                    "overall_impression": "Impression générale brève",
+                                    "strengths": ["point fort 1", "point fort 2", "point fort 3"],
+                                    "encouragement": "Message d'encouragement"
                                 },
                                 "improvements": [
                                     {
-                                        "category": "Grammar/Vocabulary/Structure/etc",
-                                        "title": "Specific area to improve",
-                                        "description": "Detailed description",
-                                        "explanation": "Why this is important",
+                                        "category": "Grammaire/Vocabulaire/Structure/etc",
+                                        "title": "Domaine spécifique à améliorer",
+                                        "description": "Description détaillée",
+                                        "explanation": "Pourquoi c'est important",
                                         "examples": {
-                                            "original_excerpts": ["user sentence 1", "user sentence 2"],
-                                            "improved_versions": ["improved version 1", "improved version 2"]
+                                            "original_excerpts": ["phrase de l'utilisateur 1", "phrase de l'utilisateur 2"],
+                                            "improved_versions": ["version améliorée 1", "version améliorée 2"]
                                         },
-                                        "practice_tip": "Practical tip for improvement"
+                                        "practice_tip": "Conseil pratique pour s'améliorer"
                                     }
                                 ],
                                 "progression_tips": [
                                     {
-                                        "area": "Specific area",
-                                        "tip": "Practical tip",
-                                        "reason": "Why this helps"
+                                        "area": "Domaine spécifique",
+                                        "tip": "Conseil pratique",
+                                        "reason": "Pourquoi cela aide"
                                     }
                                 ],
                                 "level_assessment": {
                                     "estimated_cefr": "A2/B1/B2/C1/C2",
-                                    "confidence_score": 0.6,
+                                    "confidence_score":'estimation du level en format 0.6',
                                     "next_level_goals": ["goal1", "goal2", "goal3"]
                                 }
                             }
                         }
                         
-                        Focus on constructive feedback that helps improve their English writing skills. Be precise and provide concrete examples.`
+                        Concentrez-vous sur un retour constructif qui aide à améliorer leurs compétences en écriture anglaise. Soyez précis et fournissez des exemples concrets.`
                     },
                     {
                         role: 'user',
@@ -918,7 +931,7 @@
                     }
                 ];
                 
-                // Envoyer la requête à l'API avec streaming
+                // Envoyer la requête à l'API
                 const response = await fetch(API_CONFIG.API_URL, {
                     method: 'POST',
                     headers: {
@@ -928,8 +941,7 @@
                     body: JSON.stringify({
                         model: API_CONFIG.MODEL,
                         messages: messages,
-                        temperature: 0.7,
-                        stream: true
+                        temperature: 0.7
                     })
                 });
                 
@@ -937,65 +949,47 @@
                     throw new Error(`HTTP Error ${response.status}`);
                 }
                 
-                // Lire le flux de données
-                const reader = response.body.getReader();
-                const decoder = new TextDecoder();
+                const data = await response.json();
                 
-                hideTypingIndicator();
+                // Extraire la réponse
+                const botResponse = data.choices?.[0]?.message?.content;
                 
-                while (true) {
-                    const { done, value } = await reader.read();
-                    if (done) break;
+                if (botResponse) {
+                    // Supprimer l'indicateur de chargement et de frappe
+                    hideLoading();
+                    typingMessage.remove();
                     
-                    const chunk = decoder.decode(value);
-                    processStreamData(chunk);
-                }
-                
-                // Si le streaming n'a pas déjà affiché le contenu formaté
-                if (!document.getElementById('streaming-message')) {
-                    try {
-                        // Essayer d'extraire et parser le JSON final
-                        const jsonMatch = accumulatedContent.match(/\{[\s\S]*\}/);
-                        if (jsonMatch) {
-                            const parsedResponse = JSON.parse(jsonMatch[0]);
-                            addMessage(formatFeedbackResponse(parsedResponse), false);
-                            
-                            // Mettre à jour l'historique
-                            conversationHistory.push(
-                                { role: 'user', content: userMessage },
-                                { role: 'assistant', content: JSON.stringify(parsedResponse) }
-                            );
-                        }
-                    } catch (jsonError) {
-                        console.error('Error parsing final JSON:', jsonError);
-                        addMessage(accumulatedContent, false);
-                        
-                        conversationHistory.push(
-                            { role: 'user', content: userMessage },
-                            { role: 'assistant', content: accumulatedContent }
-                        );
-                    }
-                } else {
-                    // Le streaming a déjà affiché le contenu formaté
+                    // Ajouter le message du bot avec effet de frappe
+                    const botMessageDiv = addMessage(botResponse, false);
+                    
+                    // Afficher le contenu progressivement
+                    await displayProgressiveResponse(botMessageDiv, botResponse);
+                    
+                    // Mettre à jour l'historique
                     conversationHistory.push(
                         { role: 'user', content: userMessage },
-                        { role: 'assistant', content: accumulatedContent }
+                        { role: 'assistant', content: botResponse }
                     );
-                }
-                
-                // Limiter l'historique
-                if (conversationHistory.length > 20) {
-                    conversationHistory = conversationHistory.slice(-20);
+                    
+                    // Limiter l'historique
+                    if (conversationHistory.length > 20) {
+                        conversationHistory = conversationHistory.slice(-20);
+                    }
+                } else {
+                    throw new Error('Invalid response format');
                 }
                 
             } catch (error) {
                 console.error('Error:', error);
-                hideTypingIndicator();
+                
+                // Supprimer l'indicateur de chargement et de frappe
+                hideLoading();
+                typingMessage.remove();
+                
                 showError(error.message);
                 addMessage("Sorry, an error occurred. Please try again.");
             } finally {
                 // Réactiver l'input
-                isProcessingStream = false;
                 messageInput.disabled = false;
                 messageInput.focus();
             }
