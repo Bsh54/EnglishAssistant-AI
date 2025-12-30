@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat API Simple</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f5f5f5;
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 30px;
+            min-height: 500px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #2c3e50;
+        }
+
+        .chat-container {
+            flex: 1;
+            overflow-y: auto;
+            margin-bottom: 20px;
+            padding: 10px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            background: #fafafa;
+            min-height: 300px;
+        }
+
+        .message {
+            margin-bottom: 15px;
+            padding: 12px 16px;
+            border-radius: 8px;
+            max-width: 80%;
+        }
+
+        .user-message {
+            background: #007bff;
+            color: white;
+            margin-left: auto;
+            text-align: right;
+        }
+
+        .bot-message {
+            background: #e9ecef;
+            color: #333;
+            margin-right: auto;
+        }
+
+        .input-area {
+            display: flex;
+            gap: 10px;
+        }
+
+        input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #007bff;
+        }
+
+        button {
+            padding: 12px 24px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background: #0056b3;
+        }
+
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .loading {
+            text-align: center;
+            color: #666;
+            padding: 10px;
+        }
+
+        .error {
+            background: #fee;
+            color: #c33;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+
+        /* Styles pour le formatage des réponses */
+        .feedback-container {
+            font-size: 14px;
+        }
+
+        .feedback-section {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            border-left: 4px solid #007bff;
+        }
+
+        .feedback-title {
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .feedback-subtitle {
+            font-weight: 600;
+            color: #34495e;
+            margin: 12px 0 5px 0;
+        }
+
+        .feedback-list {
+            margin-left: 20px;
+            margin-bottom: 10px;
+        }
+
+        .feedback-item {
+            margin-bottom: 8px;
+        }
+
+        .improvement-item {
+            background: #fff8e1;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            border-left: 3px solid #ff9800;
+        }
+
+        .example-box {
+            background: #f5f5f5;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 8px 0;
+        }
+
+        .example-original {
+            color: #d32f2f;
+            font-style: italic;
+        }
+
+        .example-improved {
+            color: #388e3c;
+            font-weight: 500;
+        }
+
+        .tip-box {
+            background: #e8f5e9;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 8px 0;
+            border-left: 3px solid #4caf50;
+        }
+
+        .level-assessment {
+            background: #e3f2fd;
+            padding: 12px;
+            border-radius: 6px;
+            margin-top: 15px;
+        }
+
+        .level-badge {
+            display: inline-block;
+            background: #2196f3;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Chat API</h1>
+        
+        <div class="chat-container" id="chatContainer">
+            <div class="message bot-message">
+                Bonjour ! Posez-moi une question.
+            </div>
+        </div>
+
+        <div class="input-area">
+            <input 
+                type="text" 
+                id="messageInput" 
+                placeholder="Tapez votre message ici..."
+                onkeypress="if(event.key === 'Enter') sendMessage()"
+            >
+            <button onclick="sendMessage()" id="sendButton">Envoyer</button>
+        </div>
+    </div>
+
+    <script>
+        // Configuration de l'API
+        const API_CONFIG = {
+            API_KEY: 'or_af89e5c2192663121d7b12791136353a7454a9e0d4ea49267da3b7d3',
+            API_URL: 'https://oreus-staging.dev2.dev-id.fr/api/v1/sdk/chat/completions',
+            MODEL: 'EnglisAssistant'
+        };
+
+        // Éléments du DOM
+        const chatContainer = document.getElementById('chatContainer');
+        const messageInput = document.getElementById('messageInput');
+        const sendButton = document.getElementById('sendButton');
+
+        // Historique de conversation
+        let conversationHistory = [];
+
+        // Fonction pour nettoyer et parser le JSON
+        function parseJsonResponse(text) {
+            try {
+                // Supprimer les backticks et le mot "json" s'ils existent
+                let cleanedText = text.trim();
+                
+                // Si le texte commence par ```json et finit par ```
+                if (cleanedText.startsWith('```json')) {
+                    cleanedText = cleanedText.substring(7); // Enlever ```json
+                }
+                if (cleanedText.startsWith('```')) {
+                    cleanedText = cleanedText.substring(3); // Enlever ``` au début
+                }
+                if (cleanedText.endsWith('```')) {
+                    cleanedText = cleanedText.substring(0, cleanedText.length - 3); // Enlever ``` à la fin
+                }
+                
+                // Parser le JSON
+                return JSON.parse(cleanedText);
+            } catch (error) {
+                console.error('Erreur de parsing JSON:', error);
+                return null;
+            }
+        }
+
+        // Ajouter un message dans le chat
+        function addMessage(content, isUser = false) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${isUser ? 'user-message' : 'bot-message'}`;
+            
+            if (!isUser) {
+                // Essayer de parser comme JSON
+                const parsedResponse = parseJsonResponse(content);
+                
+                if (parsedResponse && parsedResponse.feedback) {
+                    // C'est un feedback formaté, utiliser le formatage spécial
+                    messageDiv.innerHTML = formatFeedbackResponse(parsedResponse);
+                } else {
+                    // Sinon, afficher le texte normalement
+                    messageDiv.textContent = content;
+                }
+            } else {
+                // Message utilisateur : texte simple
+                messageDiv.textContent = content;
+            }
+            
+            chatContainer.appendChild(messageDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        // Formater la réponse JSON en HTML lisible
+        function formatFeedbackResponse(data) {
+            const feedback = data.feedback;
+            
+            let html = `
+                <div class="feedback-container">
+                    <div class="feedback-section">
+                        <div class="feedback-title">📊 Impressions générales</div>
+                        <div class="feedback-item">${feedback.general.overall_impression}</div>
+                        
+                        <div class="feedback-subtitle">✅ Points forts :</div>
+                        <div class="feedback-list">
+                            ${feedback.general.strengths.map(strength => 
+                                `<div class="feedback-item">• ${strength}</div>`
+                            ).join('')}
+                        </div>
+                        
+                        <div class="feedback-subtitle">💪 Encouragement :</div>
+                        <div class="feedback-item">${feedback.general.encouragement}</div>
+                    </div>
+            `;
+
+            // Améliorations suggérées
+            if (feedback.improvements && feedback.improvements.length > 0) {
+                html += `
+                    <div class="feedback-section">
+                        <div class="feedback-title">🔧 Améliorations suggérées</div>
+                `;
+                
+                feedback.improvements.forEach(improvement => {
+                    html += `
+                        <div class="improvement-item">
+                            <div class="feedback-subtitle">${improvement.category} : ${improvement.title}</div>
+                            <div class="feedback-item">${improvement.description}</div>
+                            <div class="feedback-item"><em>${improvement.explanation}</em></div>
+                            
+                            <div class="feedback-subtitle">💡 Exemples :</div>
+                    `;
+                    
+                    // Afficher tous les exemples s'ils existent
+                    if (improvement.examples && improvement.examples.original_excerpts && improvement.examples.improved_versions) {
+                        const examples = Math.min(improvement.examples.original_excerpts.length, improvement.examples.improved_versions.length);
+                        
+                        for (let i = 0; i < examples; i++) {
+                            html += `
+                                <div class="example-box">
+                                    <div class="example-original">
+                                        <strong>Original :</strong> ${improvement.examples.original_excerpts[i]}
+                                    </div>
+                                    <div class="example-improved">
+                                        <strong>Amélioré :</strong> ${improvement.examples.improved_versions[i]}
+                                    </div>
+                                </div>
+                            `;
+                        }
+                    }
+                    
+                    html += `
+                            <div class="tip-box">
+                                <strong>Conseil pratique :</strong> ${improvement.practice_tip}
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                html += `</div>`;
+            }
+
+            // Conseils de progression
+            if (feedback.progression_tips && feedback.progression_tips.length > 0) {
+                html += `
+                    <div class="feedback-section">
+                        <div class="feedback-title">🎯 Conseils de progression</div>
+                `;
+                
+                feedback.progression_tips.forEach(tip => {
+                    html += `
+                        <div class="tip-box">
+                            <div><strong>${tip.area} :</strong> ${tip.tip}</div>
+                            <div><em>Raison :</em> ${tip.reason}</div>
+                        </div>
+                    `;
+                });
+                
+                html += `</div>`;
+            }
+
+            // Évaluation du niveau
+            if (feedback.level_assessment) {
+                const level = feedback.level_assessment;
+                html += `
+                    <div class="feedback-section">
+                        <div class="feedback-title">📈 Évaluation du niveau</div>
+                        <div class="level-assessment">
+                            <span class="level-badge">${level.estimated_cefr}</span>
+                            <span>Confiance : ${Math.round(level.confidence_score * 100)}%</span>
+                            
+                            <div class="feedback-subtitle" style="margin-top: 10px;">🎯 Objectifs pour le prochain niveau :</div>
+                            <div class="feedback-list">
+                                ${level.next_level_goals.map(goal => 
+                                    `<div class="feedback-item">• ${goal}</div>`
+                                ).join('')}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            html += `</div>`;
+            return html;
+        }
+
+        // Afficher un indicateur de chargement
+        function showLoading() {
+            const loadingDiv = document.createElement('div');
+            loadingDiv.id = 'loading';
+            loadingDiv.className = 'loading';
+            loadingDiv.textContent = 'Réflexion en cours...';
+            chatContainer.appendChild(loadingDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        // Masquer l'indicateur de chargement
+        function hideLoading() {
+            const loadingDiv = document.getElementById('loading');
+            if (loadingDiv) {
+                loadingDiv.remove();
+            }
+        }
+
+        // Afficher une erreur
+        function showError(error) {
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'error';
+            errorDiv.textContent = `Erreur : ${error}`;
+            chatContainer.appendChild(errorDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        // Envoyer un message à l'API
+        async function sendMessage() {
+            const userMessage = messageInput.value.trim();
+            
+            if (!userMessage) return;
+            
+            // Désactiver l'input pendant le traitement
+            messageInput.disabled = true;
+            sendButton.disabled = true;
+            
+            // Ajouter le message de l'utilisateur
+            addMessage(userMessage, true);
+            messageInput.value = '';
+            
+            // Afficher le chargement
+            showLoading();
+            
+            try {
+                // Préparer les messages pour l'API
+                const messages = [
+                    {
+                        role: 'system',
+                        content: "Vous êtes un assistant utile."
+                    },
+                    ...conversationHistory,
+                    {
+                        role: 'user',
+                        content: userMessage
+                    }
+                ];
+                
+                // Envoyer la requête à l'API
+                const response = await fetch(API_CONFIG.API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${API_CONFIG.API_KEY}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        model: API_CONFIG.MODEL,
+                        messages: messages,
+                        temperature: 0
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`Erreur HTTP ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                // Extraire la réponse
+                const botResponse = data.choices?.[0]?.message?.content;
+                
+                if (botResponse) {
+                    // Ajouter la réponse formatée
+                    addMessage(botResponse);
+                    
+                    // Mettre à jour l'historique
+                    conversationHistory.push(
+                        { role: 'user', content: userMessage },
+                        { role: 'assistant', content: botResponse }
+                    );
+                    
+                    // Limiter l'historique
+                    if (conversationHistory.length > 20) {
+                        conversationHistory = conversationHistory.slice(-20);
+                    }
+                } else {
+                    throw new Error('Format de réponse invalide');
+                }
+                
+            } catch (error) {
+                console.error('Erreur:', error);
+                showError(error.message);
+                addMessage("Désolé, une erreur s'est produite. Veuillez réessayer.");
+            } finally {
+                // Réactiver l'input
+                hideLoading();
+                messageInput.disabled = false;
+                sendButton.disabled = false;
+                messageInput.focus();
+            }
+        }
+        
+        // Focus initial sur l'input
+        messageInput.focus();
+    </script>
+</body>
+</html>
