@@ -106,13 +106,6 @@
             padding: 12px 16px;
             border-radius: 8px;
             max-width: 80%;
-            opacity: 0;
-            animation: fadeIn 0.3s ease forwards;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
         }
 
         .user-message {
@@ -120,14 +113,12 @@
             color: white;
             margin-left: auto;
             text-align: right;
-            animation-delay: 0.1s;
         }
 
         .bot-message {
             background: #e9ecef;
             color: #333;
             margin-right: auto;
-            animation-delay: 0.2s;
         }
 
         .input-area {
@@ -180,113 +171,10 @@
             background: #007bff;
         }
 
-        /* Styles pour le loading */
-        .loading-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 30px;
-            margin: 20px 0;
-            background: #f8f9fa;
-            border-radius: 10px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-
-        .loading-spinner {
-            width: 50px;
-            height: 50px;
-            border: 3px solid #e0e0e0;
-            border-top: 3px solid #007bff;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-bottom: 15px;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .loading-text {
-            font-size: 16px;
+        .loading {
+            text-align: center;
             color: #666;
-            font-weight: 500;
-            margin-bottom: 10px;
-        }
-
-        .loading-dots {
-            display: flex;
-            gap: 5px;
-            margin-top: 10px;
-        }
-
-        .loading-dots span {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: #007bff;
-            opacity: 0.6;
-            animation: pulse 1.4s infinite ease-in-out;
-        }
-
-        .loading-dots span:nth-child(1) { animation-delay: -0.32s; }
-        .loading-dots span:nth-child(2) { animation-delay: -0.16s; }
-        .loading-dots span:nth-child(3) { animation-delay: 0s; }
-
-        @keyframes pulse {
-            0%, 80%, 100% { transform: scale(0.8); opacity: 0.6; }
-            40% { transform: scale(1.2); opacity: 1; }
-        }
-
-        .thinking-text {
-            color: #666;
-            font-style: italic;
-            font-size: 14px;
-            margin-top: 5px;
-        }
-
-        /* Styles pour l'affichage progressif */
-        .typing-indicator {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 10px 15px;
-            background: #f0f0f0;
-            border-radius: 20px;
-            width: fit-content;
-            margin-bottom: 15px;
-        }
-
-        .typing-dot {
-            width: 8px;
-            height: 8px;
-            background: #666;
-            border-radius: 50%;
-            animation: typing 1.4s infinite ease-in-out;
-        }
-
-        .typing-dot:nth-child(1) { animation-delay: -0.32s; }
-        .typing-dot:nth-child(2) { animation-delay: -0.16s; }
-        .typing-dot:nth-child(3) { animation-delay: 0s; }
-
-        @keyframes typing {
-            0%, 80%, 100% { transform: translateY(0); opacity: 0.6; }
-            40% { transform: translateY(-10px); opacity: 1; }
-        }
-
-        .response-content {
-            line-height: 1.6;
-            opacity: 0;
-            transform: translateY(10px);
-            animation: typewriter 0.05s steps(1) forwards;
-        }
-
-        @keyframes typewriter {
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            padding: 10px;
         }
 
         .error {
@@ -317,16 +205,6 @@
             background: white;
             border-radius: 8px;
             border-left: 4px solid #007bff;
-            opacity: 0;
-            transform: translateY(10px);
-            animation: fadeInUp 0.5s ease forwards;
-        }
-
-        @keyframes fadeInUp {
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
         }
 
         .feedback-title {
@@ -349,9 +227,6 @@
 
         .feedback-item {
             margin-bottom: 8px;
-            opacity: 0;
-            animation: fadeIn 0.3s ease forwards;
-            animation-delay: calc(var(--item-index) * 0.1s);
         }
 
         .improvement-item {
@@ -408,8 +283,6 @@
             background: #4caf50;
             margin-top: 10px;
             width: 100%;
-            animation: fadeIn 0.5s ease 1s forwards;
-            opacity: 0;
         }
 
         .new-prompt-button:hover {
@@ -591,21 +464,11 @@
         }
 
         // Ajouter un message dans le chat
-        function addMessage(content, isUser = false, isTyping = false) {
+        function addMessage(content, isUser = false) {
             const messageDiv = document.createElement('div');
             messageDiv.className = `message ${isUser ? 'user-message' : 'bot-message'}`;
             
-            if (isTyping) {
-                // Afficher l'indicateur de frappe
-                messageDiv.innerHTML = `
-                    <div class="typing-indicator">
-                        <div class="typing-dot"></div>
-                        <div class="typing-dot"></div>
-                        <div class="typing-dot"></div>
-                        <div class="thinking-text">AI is thinking...</div>
-                    </div>
-                `;
-            } else if (!isUser) {
+            if (!isUser) {
                 // Essayer de parser comme JSON
                 const parsedResponse = parseJsonResponse(content);
                 
@@ -614,7 +477,7 @@
                     messageDiv.innerHTML = formatFeedbackResponse(parsedResponse);
                 } else {
                     // Sinon, afficher le texte normalement
-                    messageDiv.innerHTML = `<div class="response-content">${content}</div>`;
+                    messageDiv.innerHTML = content;
                 }
             } else {
                 // Message utilisateur : texte simple
@@ -624,64 +487,9 @@
             
             chatContainer.appendChild(messageDiv);
             chatContainer.scrollTop = chatContainer.scrollHeight;
-            
-            return messageDiv;
         }
 
-        // Afficher un indicateur de chargement élégant
-        function showLoading() {
-            const loadingDiv = document.createElement('div');
-            loadingDiv.id = 'loading';
-            loadingDiv.className = 'loading-container';
-
-            chatContainer.appendChild(loadingDiv);
-            chatContainer.scrollTop = chatContainer.scrollHeight;
-        }
-
-        // Masquer l'indicateur de chargement
-        function hideLoading() {
-            const loadingDiv = document.getElementById('loading');
-            if (loadingDiv) {
-                loadingDiv.remove();
-            }
-        }
-
-        // Fonction pour afficher le texte progressivement
-        function typeText(element, text, speed = 20) {
-            return new Promise((resolve) => {
-                let i = 0;
-                element.innerHTML = '';
-                
-                function typeChar() {
-                    if (i < text.length) {
-                        // Ajouter le caractère suivant
-                        element.innerHTML += text.charAt(i);
-                        i++;
-                        
-                        // Faire défiler vers le bas
-                        chatContainer.scrollTop = chatContainer.scrollHeight;
-                        
-                        // Prochain caractère
-                        setTimeout(typeChar, speed);
-                    } else {
-                        resolve();
-                    }
-                }
-                
-                typeChar();
-            });
-        }
-
-        // Fonction pour afficher une réponse progressivement
-        function displayProgressiveResponse(messageDiv, content) {
-            const contentDiv = messageDiv.querySelector('.response-content');
-            if (contentDiv) {
-                return typeText(contentDiv, content, 10);
-            }
-            return Promise.resolve();
-        }
-
-        // Fonction pour parser le JSON
+        // Fonction pour nettoyer et parser le JSON
         function parseJsonResponse(text) {
             try {
                 // Supprimer les backticks et le mot "json" s'ils existent
@@ -714,32 +522,30 @@
                 <div class="feedback-container">
                     <div class="feedback-section">
                         <div class="feedback-title">📊 Overall Impressions</div>
-                        <div class="feedback-item" style="--item-index: 0">${feedback.general.overall_impression}</div>
+                        <div class="feedback-item">${feedback.general.overall_impression}</div>
                         
                         <div class="feedback-subtitle">✅ Strengths:</div>
                         <div class="feedback-list">
-                            ${feedback.general.strengths.map((strength, index) => 
-                                `<div class="feedback-item" style="--item-index: ${index + 1}">• ${strength}</div>`
+                            ${feedback.general.strengths.map(strength => 
+                                `<div class="feedback-item">• ${strength}</div>`
                             ).join('')}
                         </div>
                         
                         <div class="feedback-subtitle">💪 Encouragement:</div>
-                        <div class="feedback-item" style="--item-index: ${feedback.general.strengths.length + 2}">${feedback.general.encouragement}</div>
+                        <div class="feedback-item">${feedback.general.encouragement}</div>
                     </div>
             `;
 
             // Améliorations suggérées
             if (feedback.improvements && feedback.improvements.length > 0) {
-                let itemIndex = feedback.general.strengths.length + 5;
-                
                 html += `
                     <div class="feedback-section">
                         <div class="feedback-title">🔧 Suggested Improvements</div>
                 `;
                 
-                feedback.improvements.forEach((improvement, impIndex) => {
+                feedback.improvements.forEach(improvement => {
                     html += `
-                        <div class="improvement-item" style="--item-index: ${itemIndex++}">
+                        <div class="improvement-item">
                             <div class="feedback-subtitle">${improvement.category} : ${improvement.title}</div>
                             <div class="feedback-item">${improvement.description}</div>
                             <div class="feedback-item"><em>${improvement.explanation}</em></div>
@@ -753,7 +559,7 @@
                         
                         for (let i = 0; i < examples; i++) {
                             html += `
-                                <div class="example-box" style="--item-index: ${itemIndex++}">
+                                <div class="example-box">
                                     <div class="example-original">
                                         <strong>Original:</strong> ${improvement.examples.original_excerpts[i]}
                                     </div>
@@ -766,7 +572,7 @@
                     }
                     
                     html += `
-                            <div class="tip-box" style="--item-index: ${itemIndex++}">
+                            <div class="tip-box">
                                 <strong>Practice Tip:</strong> ${improvement.practice_tip}
                             </div>
                         </div>
@@ -778,16 +584,14 @@
 
             // Conseils de progression
             if (feedback.progression_tips && feedback.progression_tips.length > 0) {
-                let itemIndex = 50; // Start at higher index for later animation
-                
                 html += `
                     <div class="feedback-section">
                         <div class="feedback-title">🎯 Progression Tips</div>
                 `;
                 
-                feedback.progression_tips.forEach((tip, tipIndex) => {
+                feedback.progression_tips.forEach(tip => {
                     html += `
-                        <div class="tip-box" style="--item-index: ${itemIndex++}">
+                        <div class="tip-box">
                             <div><strong>${tip.area}:</strong> ${tip.tip}</div>
                             <div><em>Reason:</em> ${tip.reason}</div>
                         </div>
@@ -803,14 +607,14 @@
                 html += `
                     <div class="feedback-section">
                         <div class="feedback-title">📈 Level Assessment</div>
-                        <div class="level-assessment" style="--item-index: 60">
+                        <div class="level-assessment">
                             <span class="level-badge">${level.estimated_cefr}</span>
                             <span>Confidence: ${Math.round(level.confidence_score * 100)}%</span>
                             
                             <div class="feedback-subtitle" style="margin-top: 10px;">🎯 Goals for Next Level:</div>
                             <div class="feedback-list">
-                                ${level.next_level_goals.map((goal, index) => 
-                                    `<div class="feedback-item" style="--item-index: ${61 + index}">• ${goal}</div>`
+                                ${level.next_level_goals.map(goal => 
+                                    `<div class="feedback-item">• ${goal}</div>`
                                 ).join('')}
                             </div>
                         </div>
@@ -829,6 +633,24 @@
             return html;
         }
 
+        // Afficher un indicateur de chargement
+        function showLoading() {
+            const loadingDiv = document.createElement('div');
+            loadingDiv.id = 'loading';
+            loadingDiv.className = 'loading';
+            loadingDiv.textContent = 'Analyzing your writing...';
+            chatContainer.appendChild(loadingDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        // Masquer l'indicateur de chargement
+        function hideLoading() {
+            const loadingDiv = document.getElementById('loading');
+            if (loadingDiv) {
+                loadingDiv.remove();
+            }
+        }
+
         // Afficher une erreur
         function showError(error) {
             const errorDiv = document.createElement('div');
@@ -842,7 +664,7 @@
         function showSuccess(message) {
             const successDiv = document.createElement('div');
             successDiv.className = 'success-message';
-            successDiv.innerHTML = message;
+            successDiv.textContent = message;
             chatContainer.appendChild(successDiv);
             chatContainer.scrollTop = chatContainer.scrollHeight;
         }
@@ -871,13 +693,11 @@
             addMessage(userMessage, true);
             messageInput.value = '';
             
-
+            // Afficher le message de succès
+            showSuccess(`✅ Great job! You wrote ${wordCount} words. Now analyzing your writing...`);
             
-            // Afficher l'indicateur de chargement
+            // Afficher le chargement
             showLoading();
-            
-            // Ajouter l'indicateur "IA en train de réfléchir"
-            const typingMessage = addMessage('', false, true);
             
             try {
                 // Préparer les messages pour l'API
@@ -928,7 +748,8 @@
                     {
                         role: 'user',
                         content: `Here is my writing on "${currentWritingSession.topic}":\n\n${userMessage}`
-                    }
+                    },
+
                 ];
                 
                 // Envoyer la requête à l'API
@@ -955,15 +776,8 @@
                 const botResponse = data.choices?.[0]?.message?.content;
                 
                 if (botResponse) {
-                    // Supprimer l'indicateur de chargement et de frappe
-                    hideLoading();
-                    typingMessage.remove();
-                    
-                    // Ajouter le message du bot avec effet de frappe
-                    const botMessageDiv = addMessage(botResponse, false);
-                    
-                    // Afficher le contenu progressivement
-                    await displayProgressiveResponse(botMessageDiv, botResponse);
+                    // Ajouter la réponse formatée
+                    addMessage(botResponse);
                     
                     // Mettre à jour l'historique
                     conversationHistory.push(
@@ -981,15 +795,11 @@
                 
             } catch (error) {
                 console.error('Error:', error);
-                
-                // Supprimer l'indicateur de chargement et de frappe
-                hideLoading();
-                typingMessage.remove();
-                
                 showError(error.message);
                 addMessage("Sorry, an error occurred. Please try again.");
             } finally {
                 // Réactiver l'input
+                hideLoading();
                 messageInput.disabled = false;
                 messageInput.focus();
             }
